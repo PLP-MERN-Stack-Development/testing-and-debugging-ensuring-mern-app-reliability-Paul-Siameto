@@ -1,0 +1,34 @@
+{
+  "name": "mern-testing-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "test": "cd .. && jest --selectProjects server",
+    "test:unit": "cd .. && jest --selectProjects server --testPathPattern=\"server/tests/unit\"",
+    "test:integration": "cd .. && jest --selectProjects server --testPathPattern=\"server/tests/integration\"",
+    "setup-test-db": "node scripts/setupTestDb.js",
+    "coverage": "cd .. && jest --selectProjects server --coverage"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^7.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1",
+    "morgan": "^1.10.0",
+    "slugify": "^1.6.6",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.24.7",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^6.3.4"
+  }
+}
+

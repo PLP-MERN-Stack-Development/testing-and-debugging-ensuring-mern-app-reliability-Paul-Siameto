@@ -1,12 +1,12 @@
 // posts.test.js - Integration tests for posts API endpoints
 
-const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../../src/app');
-const Post = require('../../src/models/Post');
-const User = require('../../src/models/User');
-const { generateToken } = require('../../src/utils/auth');
+import request from 'supertest';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import app from '../../src/app.js';
+import Post from '../../src/models/Post.js';
+import User from '../../src/models/User.js';
+import { generateToken } from '../../src/utils/auth.js';
 
 let mongoServer;
 let token;
@@ -15,9 +15,14 @@ let postId;
 
 // Setup in-memory MongoDB server before all tests
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    instance: {
+      dbName: 'test-db',
+    },
+  });
   const mongoUri = mongoServer.getUri();
   await mongoose.connect(mongoUri);
+}, 60000); // 60 second timeout for first-time binary download
 
   // Create a test user
   const user = await User.create({
@@ -33,7 +38,7 @@ beforeAll(async () => {
     title: 'Test Post',
     content: 'This is a test post content',
     author: userId,
-    category: mongoose.Types.ObjectId(),
+    category: mongoose.Types.ObjectId().toString(),
     slug: 'test-post',
   });
   postId = post._id;
@@ -41,9 +46,13 @@ beforeAll(async () => {
 
 // Clean up after all tests
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+}, 30000);
 
 // Clean up database between tests
 afterEach(async () => {
@@ -146,7 +155,7 @@ describe('GET /api/posts', () => {
         title: `Pagination Post ${i}`,
         content: `Content for pagination test ${i}`,
         author: userId,
-        category: mongoose.Types.ObjectId(),
+      category: mongoose.Types.ObjectId().toString(),
         slug: `pagination-post-${i}`,
       });
     }
